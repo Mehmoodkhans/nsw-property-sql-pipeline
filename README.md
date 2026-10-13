@@ -254,7 +254,6 @@ nsw-property-sql-pipeline/
 ├── README.md
 │
 ├── notebooks/
-│   ├── NSW_Master.ipynb                       Stage 1: extraction & cleaning
 │   └── 01.NSW_Property_SQL_Pipeline.ipynb     Stage 2: SQL pipeline (Stages 00–13)
 │
 ├── Visual/                                    All 23 charts (PNG)
@@ -264,8 +263,7 @@ nsw-property-sql-pipeline/
 │
 └── docs/
     ├── data_provenance.md
-    └── pipeline_architecture.md
-```
+    └── pipeline_architecture.md```
 
 ---
 
