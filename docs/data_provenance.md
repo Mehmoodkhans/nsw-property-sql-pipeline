@@ -1,15 +1,15 @@
 # Data Provenance, Scope and Research Potential
-## NSW Property Market — SQL Data Pipeline
-**Mehmood Ahmed** | [![LinkedIn](https://img.shields.io/badge/LinkedIn-Mehmood%20Ahmed-0077B5?logo=linkedin&logoColor=white)](https://www.linkedin.com/in/mehmoood)
+## NSW Property Market — End-to-End Data Pipeline
+**Mehmood Ahmed Khan** | [![LinkedIn](https://img.shields.io/badge/LinkedIn-Mehmood%20Ahmed-0077B5?logo=linkedin&logoColor=white)](https://www.linkedin.com/in/mehmoood)
 
 ---
 
 ## Overview
 
 This document describes the origin, scope, known limitations, and research potential of the dataset
-underlying the NSW Property Market SQL Data Pipeline. It is intended for researchers, government
-analysts, and industry practitioners who wish to understand not just what this pipeline produces —
-but what the data can and cannot tell you, and where serious analytical opportunity remains.
+underlying the NSW Property Market pipeline. It is intended for researchers, government analysts,
+and industry practitioners who wish to understand not just what this pipeline produces — but what
+the data can and cannot tell you, and where serious analytical opportunity remains.
 
 ---
 
@@ -17,21 +17,24 @@ but what the data can and cannot tell you, and where serious analytical opportun
 
 ### Primary Source — NSW Valuer General Bulk Data
 
-The transaction data originates from the **NSW Valuer General** — the government authority responsible
-for property valuations and the official registry of property sales across New South Wales.
+The transaction data originates from the **NSW Valuer General** — the government authority
+responsible for property valuations and the official registry of property sales across New South Wales.
 
-The bulk data is publicly available and covers **all property sales registered in NSW**, including
-residential, commercial, rural, and industrial transactions. Records are filed at settlement date
-and include purchase price, property type, land area, and geographic identifiers down to street address
-and postcode level.
+The data is published weekly as `.DAT` files inside nested zip archives — one zip per year containing
+one zip per weekly extract, each containing district-level files. A sale record has exactly 24
+semicolon-separated fields across four record types (header, sale, legal description, party flags).
+Stage 1 of this pipeline extracts and parses these archives directly from the raw files.
 
-**A critical fact about this archive:**
-The NSW Valuer General bulk data collection extends from the **early 1990s** — representing
-approximately 45 years of continuous property transaction records across the entire state.
+The archive covers property sales registered in NSW — residential, commercial, rural, and industrial
+transactions — from 1990 onwards, about 36 years. Each record carries the contract and settlement dates,
+purchase price, property type, land area, and geographic identifiers down to street name and postcode level.
 
-This pipeline currently covers **2018–2025** — a deliberate scope decision explained in Section 3.
-Extension to the full historical archive is architecturally straightforward and represents a natural
-next phase for any researcher or organisation requiring long-run market analysis.
+**Archive scale accessed in this pipeline:**
+10 yearly archives · 520 weekly extracts · 66,747 district files · 04 Jan 2016 – 29 Dec 2025
+
+This pipeline's analytical layer covers **2018–2025** — a deliberate scope decision explained
+in Section 2. Extension to the full historical archive is architecturally straightforward and
+represents a natural next phase for any researcher or organisation requiring long-run market analysis.
 
 ### Secondary Source — Australian Postcodes Reference
 
@@ -42,10 +45,17 @@ ABS 2021-aligned postcode dataset providing:
 - SA4 region names
 - Precise latitude and longitude coordinates
 
-This reference was selected over alternatives after discovering that a manually curated geo file
-contained corrupt coordinates — two NSW postcodes had been assigned coordinates in
-Gloucestershire, England and Pennsylvania, USA respectively. The Proctor reference was validated
-against known NSW distances before adoption.
+Coordinates were validated before use. Three problems were found in the source file itself and are handled
+explicitly:
+
+- Two localities (Birdlip and Kempton) carry impossible coordinates, in England and in the USA. An earlier
+  hand-edited extract of the file (`geo_for_merge.csv`) inherited them. Stage 2 excludes rows outside valid
+  coordinate bounds at load; Stage 1 repairs coordinates from the file's own basic latitude and longitude.
+- Fifteen localities store missing precise coordinates as 0,0; these are repaired the same way.
+- A review of places far from the rest of their own postcode lists about ten further suspect coordinates
+  (same-name places elsewhere), pending confirmation.
+
+Distances were checked against known NSW distances before use.
 
 ### Tertiary Source — RBA Cash Rate Records
 
@@ -57,8 +67,11 @@ interest rate cycles and property price movements at zone and LGA level.
 
 ## 2. Period Selection — Why 2018–2025
 
-The 2018–2025 window was not chosen arbitrarily. It was selected as the most **policy-relevant
-and analytically rich** period available in the archive for the following reasons:
+> **Note.** Figures quoted in this section and in Section 5 (+13.48%, –6.3%, 15.8×, regional resilience)
+> were computed in Stage 2 on the earlier extraction. They are being re-verified on the Stage 1 foundation.
+
+The 2018–2025 analytical window was not chosen arbitrarily. It was selected as the most
+**policy-relevant and analytically rich** period available in the archive for the following reasons:
 
 **Pre-COVID baseline (2018–2019)**
 A stable two-year reference period with moderate price growth and a well-understood interest
@@ -66,63 +79,78 @@ rate environment. Essential as the foundation for measuring subsequent disruptio
 
 **COVID-19 demand surge (2020–2021)**
 The most significant external shock to the NSW property market in decades. A +13.48% median
-price surge in 2021 alone — the largest single-year movement in the dataset — driven by
-historically low interest rates, government stimulus, and a fundamental shift in housing
-preferences during lockdown periods. No comparable window in the archive captures a disruption
-of this scale and speed.
+price surge in 2021 alone (as computed in Stage 2) — the largest single-year movement in that analysis —
+coinciding with historically low interest rates, government stimulus, and a shift in housing
+preferences during lockdown periods. This dataset cannot attribute the cause.
 
 **RBA rate hike cycle (2022–2023)**
 The most aggressive monetary policy tightening in a generation — 4.25 percentage points across
-13 consecutive increases. This pipeline captures the full transmission of that cycle into property
-prices, with the counterintuitive finding that the correction was far more modest than the
-rate movement suggested — only -6.3% from peak despite the severity of the tightening.
+13 increases (with pauses in April and from July to October 2023). This pipeline captures the full transmission of that cycle into property
+prices, with the counterintuitive finding that the correction was far more modest than the rate
+movement suggested — only –6.3% from peak in the Stage 2 analysis, despite the severity of the tightening (this figure spans
+the 2023 data gap and is to be re-verified).
 
 **Post-hike recovery (2024–2025)**
-Prices recovering toward and exceeding pre-hike peaks by Q4 2025, confirming structural demand
-resilience in the NSW market independent of monetary policy cycles.
+Prices recovering toward and exceeding pre-hike peaks by Q4 2025, consistent with continued
+demand in the NSW market.
 
-**In summary:** This eight-year window contains more structural market events per year than any
-comparable window in the 45-year archive. It is the right period for understanding how the NSW
-property market behaves under stress — which is precisely what policy analysts, urban planners,
-and serious investors need to understand.
+**In summary:** This eight-year window contains several distinct market regimes — a stable baseline, a
+pandemic-era surge, the fastest rate tightening in a generation, and a recovery. It is a strong period for
+understanding how the NSW property market behaves under stress, which is what policy analysts, urban
+planners, and investors need to understand.
 
 ---
 
 ## 3. What the Pipeline Resolves
 
-Ten quantifiable data quality issues were discovered and resolved during Stages 02–05 of the pipeline.
-Full documentation is in the main [README.md](../README.md).
+Counts and shares for every item below are maintained in the project README (Stage 1 findings), so that
+each number lives in one place.
 
-These resolutions cover: float-promoted postcodes, mislabelled area columns, government encoding
-conventions misread as data errors, null-heavy columns removed with documented justification,
-date-based scope filtering replacing unreliable year fields, and property type code normalisation.
+**Stage 1** resolves format-level challenges inherent in the raw source:
 
-Every resolution is documented with the original finding, the evidence, and the SQL decision applied.
-The raw `staging_transactions` table is preserved frozen — no finding was applied destructively.
+- Sales re-published in later extracts are de-duplicated — the latest copy is retained and possible revisions are flagged
+- Mixed area units (hectares and square metres) — the `Area_Type` field is read and `Area_sqm` is derived correctly
+- Settlement dates are read from the raw files, so no source year loses its dates
+- Geography is matched per unique (locality, postcode) place, with each match labelled by method and quality
+- Zero imputed values — every gap is flagged with a documented reason
+
+**Stage 2** resolves analytical-layer challenges discovered during SQL profiling:
+
+Ten quantifiable data quality issues were documented and resolved during Stages 02–05.
+Full documentation is in [`pipeline_architecture.md`](pipeline_architecture.md).
+
+These cover: float-promoted postcodes, government encoding conventions misread as data errors, null-heavy
+columns removed with documented justification, date-based scope filtering replacing the source-file year,
+and property type code normalisation. The raw `staging_transactions` table is preserved frozen — no finding
+was applied destructively.
+
+**Two Stage 2 conclusions were later revised by Stage 1:**
+
+- The area column was assumed to hold square metres throughout. Stage 1 found that a share of rows are in hectares.
+- The 2023 gap was attributed to a filing artifact. Stage 1 found that the dates had been lost in the earlier
+  extraction; the raw files contain them.
+
+Stage 2 is kept as published, on the earlier extraction; a new analysis layer will be built on the Stage 1 tables.
 
 ---
 
 ## 4. Known Limitations — An Honest Assessment
 
-The following limitations are stated not as apologies but as **analytical boundaries** — the
-honest perimeter of what this dataset can and cannot tell you. Understanding these boundaries
-is as important as understanding the findings themselves.
+The following limitations are stated not as apologies but as **analytical boundaries** — the honest
+perimeter of what this dataset can and cannot tell you. Understanding these boundaries is as important
+as understanding the findings themselves.
 
 ---
 
-### 4.1 Geographic Distance from the Market
+### 4.1 No On-the-Ground Market Knowledge
 
-This analysis was conducted without physical proximity to the NSW property market. The analyst
-does not have firsthand knowledge of specific suburbs, local amenity quality, or the kind of
-ground-level market intuition that a Sydney-based agent or developer carries naturally.
+This analysis was conducted without on-the-ground familiarity with individual Sydney suburbs, local amenity
+quality, or the market intuition a Sydney-based agent or developer carries.
 
-**Why this is a methodological advantage, not a weakness:**
-Every finding in this pipeline derives entirely from transaction records, ABS classifications,
-and RBA data — not from local intuition or anecdote. There is no confirmation bias toward
-familiar suburbs. No anchoring to recent headlines. The data speaks without the analyst
-filtering it through proximity bias. At 1.7M transactions across 123 LGAs and 5 density zones,
-ground-level intuition would be insufficient anyway — only systematic analysis at scale
-can reveal the patterns this pipeline identifies.
+Rather than assume which features matter, the models test it from the transaction records, ABS
+classifications, and RBA data. This is a deliberate choice, and it has a limit: suburb-level findings have
+not been checked against local market knowledge. They should be reviewed by someone who knows the area
+before being used for decisions.
 
 ---
 
@@ -139,20 +167,17 @@ What it does not capture:
 - Zoning and density policy changes at LGA level
 - COVID-era border closure effects on interstate migration demand
 
-These are real and significant drivers of NSW property price movements that operate
-independently of — and sometimes in opposition to — interest rate cycles. The 2021–2022
-price surge, for example, reflects not just record-low interest rates but the simultaneous
-effect of government stimulus, HomeBuilder grants, and pandemic-driven demand shifts that
-the RBA data alone cannot explain.
+These are real and significant drivers of NSW property price movements that operate independently of —
+and sometimes in opposition to — interest rate cycles. The 2021–2022 price surge, for example,
+reflects not just record-low interest rates but the simultaneous effect of government stimulus,
+HomeBuilder grants, and pandemic-driven demand shifts that the RBA data alone cannot explain.
 
-**What this means for users:** Price movements in this dataset should be interpreted as
-the net outcome of multiple policy forces, not attributed solely to the monetary policy
-variables captured. Analysts using these findings for policy evaluation should layer in
-the relevant fiscal and regulatory context for each period.
+**What this means for users:** Price movements in this dataset should be interpreted as the net
+outcome of multiple policy forces, not attributed solely to the monetary policy variables captured.
 
-**What this opens up:** Integration of NSW government policy event data as categorical
-timeline variables would substantially improve the explanatory power of the ML models
-and is identified as a Phase 3 enrichment opportunity.
+**What this opens up:** Integration of NSW government policy event data as categorical timeline
+variables would substantially improve the explanatory power of the ML models and is identified
+as a Phase 4 enrichment opportunity.
 
 ---
 
@@ -170,123 +195,104 @@ They do not contain:
 - Proximity to natural amenity (parks, coastline, river frontage)
 - Heritage overlay or planning restriction status
 
-**What this means for current analysis:** Price per square metre calculations and
-median price comparisons reflect zone-level and LGA-level patterns — macro geography
-rather than micro property characteristics. Two properties in the same postcode with
-vastly different attributes are treated identically in this dataset.
+**What this means for current analysis:** Price per square metre calculations and median price
+comparisons reflect zone-level and LGA-level patterns — macro geography rather than micro property
+characteristics. Two properties in the same postcode with vastly different attributes are treated
+identically in this dataset.
 
-**What this opens up:** This is the most commercially significant gap in the current
-dataset — and the most tractable to address. Integration with:
-
-- **Domain or CoreLogic** property attribute data — dwelling type, bedroom count, build year
-- **OpenStreetMap amenity layers** — transport nodes, schools, retail precincts
-- **NSW Department of Education** school catchment boundaries
-- **Transport for NSW** GTFS public transport accessibility data
-
-...would unlock true **hedonic price modelling** — isolating the independent contribution
-of each attribute to property value. This is Phase 3 of this project and represents
-the most direct path to a commercially deployable valuation tool.
+**What this opens up:** Integration with Domain or CoreLogic property attribute data, OpenStreetMap
+amenity layers, NSW Department of Education school catchment boundaries, and Transport for NSW GTFS
+public transport accessibility data would unlock true **hedonic price modelling** — isolating the
+independent contribution of each attribute to property value. This is Phase 4 of this project and
+represents the most direct path to a commercially deployable valuation tool.
 
 ---
 
-### 4.4 Text-Level Data Quality — Commercial and Rural Segments
+### 4.4 Postcode-Level Area Label Risk
 
-The 10 data quality findings resolved in the pipeline cover quantifiable, systematic issues.
-A second category of issues remains in progress:
+Every area label in the Matthew Proctor postcode reference (LGA, region, remoteness, SA2–SA4) is identical
+for all localities within a postcode. Where a postcode spans several council areas the label can be wrong
+for a specific locality (example: the town of Cessnock is labelled "Central Coast (NSW)" in the reference).
 
-**Text-level inconsistencies** in categorical fields — particularly `Primary_Purpose` — include
-spelling variants (`COMMERICAL` vs `COMMERCIAL`), compound word variations (`FARM LAND` vs
-`FARMLAND`), and domain terminology inconsistencies across the annual filing cohorts.
+36% of NSW postcodes span more than 20 km, and roughly 28% of sales fall in postcodes flagged as
+high-risk. In Stage 1 the affected columns are named `..._PostcodeLevel` and carry an `Area_Label_Risk` flag.
 
-These inconsistencies disproportionately affect **commercial and rural land use classifications**
-rather than the residential segment. The residential pipeline — which covers 1,259,466
-transactions and is the basis for all price trend and ML analysis in this repo — is not
-materially affected.
+**Stage 2 is affected too.** Its density zones, the LGA rankings (stages 10c and 10d), and the LGA-year
+median price feature in the model all rest on postcode-level labels, so they carry the same limitation.
 
-**The text audit** is being conducted separately using Python/Pandas with fuzzy text
-comparison libraries (FuzzyWuzzy, RapidFuzz) and domain expert review. This forms the
-basis of the **Phase 2 companion repository** — a classical exploratory notebook documenting
-the raw data investigation process that preceded this SQL pipeline.
-
-**What this means for users:** Findings on residential price trends, geographic segmentation,
-RBA rate correlation, and ML modelling are robust. Users working with commercial property
-classifications or rural land use analysis should treat segment-level breakdowns as
-directional until the Phase 2 text audit is published.
+An optional boundary-based LGA step (official ABS boundary files via GeoPandas) replaces postcode-level
+labels with spatially exact assignments. It is implemented in Stage 1 and has so far been tested only with a
+synthetic boundary file.
 
 ---
 
-### 4.5 Pre-2018 Historical Extension — Considerations
+### 4.5 Pre-2016 Historical Extension — Considerations
 
-For users interested in extending this pipeline to the full 45-year archive, the following
-additional challenges apply beyond those resolved for 2018–2025:
+For users interested in extending this pipeline to the full archive (about 36 years, from 1990), the following additional
+challenges apply:
 
-- **Field definition evolution** — column names, property type codes, and area measurement
-  conventions changed across decades of the archive. Normalisation would require decade-by-decade
-  schema mapping.
-- **Geographic boundary changes** — LGA boundaries, postcode assignments, and ABS
-  geographic classifications have changed multiple times since the 1990s. Longitudinal
-  geographic analysis requires boundary-consistent reclassification.
-- **Structural market breaks** — the GST introduction (2000), the Global Financial Crisis
-  (2008–2009), and multiple state government policy regimes represent structural breaks
-  that affect comparability across the full archive period.
-- **Data completeness** — earlier cohorts have higher rates of missing fields,
-  particularly for area measurements and property type codes.
+- **Field definition evolution** — column names, property type codes, and area measurement conventions
+  changed across decades of the archive. Normalisation requires decade-by-decade schema mapping.
+- **Geographic boundary changes** — LGA boundaries, postcode assignments, and ABS geographic
+  classifications have changed multiple times since the 1990s. Longitudinal geographic analysis
+  requires boundary-consistent reclassification.
+- **Structural market breaks** — the GST introduction (2000), the Global Financial Crisis (2008–2009),
+  and multiple state government policy regimes represent structural breaks that affect comparability
+  across the full archive period.
+- **Data completeness** — earlier cohorts may have higher rates of missing fields; this has not yet been examined.
 
-None of these are insurmountable. They are enumerated here so that any extension effort
-begins with clear eyes about the normalisation work required.
+None of these are insurmountable. They are enumerated here so that any extension effort begins with
+clear eyes about the normalisation work required.
 
 ---
 
 ## 5. Research and Commercial Potential
 
-The NSW Valuer General archive — properly cleaned, enriched, and extended — represents
-one of the most comprehensive longitudinal property transaction datasets available in Australia.
+The NSW Valuer General archive — properly extracted, cleaned, enriched, and extended — represents
+a comprehensive longitudinal property transaction dataset.
 
-The foundation built in this pipeline enables research and analysis across several dimensions
-of significant public, academic, and commercial interest:
+The foundation built in this pipeline enables research and analysis across several dimensions of
+significant public, academic, and commercial interest:
 
 **Housing affordability over economic cycles**
-45 years of transaction data spanning multiple interest rate cycles, government policy regimes,
-and macroeconomic shocks. Long-run affordability analysis that contextualises current conditions
-within a generational perspective — essential for credible housing policy design.
+About 36 years of transaction data spanning multiple interest rate cycles, government policy regimes, and
+macroeconomic shocks. Long-run affordability analysis that contextualises current conditions within
+a generational perspective — essential for credible housing policy design.
 
 **Geographic transmission of monetary policy**
-How do RBA rate decisions propagate differently across Metro, Inner Regional, Outer Regional,
-and Remote markets? This pipeline already shows a counterintuitive finding — Inner Regional
-prices rose during the rate hike cycle. A 45-year panel would establish whether this regional
-resilience is structural or cyclical.
+How do RBA rate decisions propagate differently across Metro, Inner Regional, Outer Regional, and
+Remote markets? Stage 2 already shows a counterintuitive finding — Inner Regional prices rose
+during the rate hike cycle (earlier data; to be re-verified). A 36-year panel would establish whether this regional resilience is
+structural or cyclical.
 
 **Urban-regional price divergence**
-The current 15.8× price per square metre ratio between Metro and Very Remote zones is striking.
-A longitudinal view would reveal whether this divergence is widening, stable, or subject to
-mean reversion — a question with direct implications for regional development policy.
+The Stage 2 figure of 15.8× for price per square metre between Metro and Very Remote zones is striking, but it
+was computed on the earlier data and is affected by the area-unit issue; it is being re-verified.
+A longitudinal view would reveal whether this divergence is widening, stable, or subject to mean
+reversion — a question with direct implications for regional development policy.
 
 **Infrastructure value uplift**
-Combining transaction data with infrastructure announcement and delivery timelines —
-metro extensions, motorway corridors, hospital developments — would isolate the measurable
-property value uplift attributable to specific public investments. A powerful tool for
-infrastructure cost-benefit analysis.
+Combining transaction data with infrastructure announcement and delivery timelines — metro
+extensions, motorway corridors, hospital developments — would isolate the measurable property value
+uplift attributable to specific public investments. A powerful tool for infrastructure cost-benefit
+analysis.
 
 **Hedonic valuation modelling**
-With Phase 3 micro-characteristic enrichment, this pipeline becomes the foundation for
-a suburb-level automated valuation model (AVM) — the same class of tool used by major
-banks, REITs, and property analytics platforms for mortgage underwriting and portfolio valuation.
+With Phase 4 micro-characteristic enrichment, this pipeline becomes the foundation for a
+suburb-level automated valuation model (AVM) — the same class of tool used by major banks, REITs,
+and property analytics platforms for mortgage underwriting and portfolio valuation.
 
 ---
 
-## 6. Collaboration and Further Development
-
-This pipeline and the dataset foundation it represents are available for discussion with
-researchers, government agencies, and industry practitioners with serious analytical interest.
-
-Current development roadmap:
+## 6. Development Roadmap
 
 | Phase | Description | Status |
 |-------|-------------|--------|
-| **Phase 1** | SQL pipeline — Stages 00–13 | Stages 00–10 complete. Stages 11–13 in progress |
-| **Phase 2** | Pandas text audit notebook — raw data investigation and commercial segment cleaning | In preparation |
-| **Phase 3** | Hedonic enrichment — property attributes and amenity layers | Scoped, not started |
-| **Phase 4** | Historical extension — pre-2018 archive normalisation | Architecture ready |
+| **Stage 1** | Extraction and cleaning — raw `.DAT` archives to verified `clean` and `analysis` tables | Complete |
+| **Stage 2** | SQL analytical pipeline — Stages 00–13, ML, forecasting | Complete on the earlier extraction; kept as published |
+| **Stage 3** | EDA and models on the `analysis` table, with property-grouped splits | Planned |
+| **Phase 4** | Hedonic enrichment — property attributes and amenity layers | Scoped, not started |
+| **Phase 5** | Historical extension — pre-2016 archive normalisation | Not started; the extraction reader should apply, but schema differences are expected |
 
 Enquiries welcome via LinkedIn:
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Mehmood%20Ahmed-0077B5?logo=linkedin&logoColor=white)](https://www.linkedin.com/in/mehmoood)
@@ -297,13 +303,12 @@ Enquiries welcome via LinkedIn:
 
 | Source | Attribution |
 |--------|-------------|
-| Property transactions | NSW Valuer General — bulk property sales data (publicly available) |
+| Property transactions | NSW Valuer General — bulk property sales data, published under Creative Commons |
 | Geographic classifications | ABS Remoteness Area 2021 (RA_2021) |
-| Postcode reference | Matthew Proctor — Australian Postcodes (ABS 2021 aligned) |
+| Postcode reference | Matthew Proctor — Australian Postcodes (ABS 2021 aligned); see the file's page for terms |
 | Monetary policy | Reserve Bank of Australia — official cash rate records |
-| CBD coordinates | Sydney CBD: -33.8688°S, 151.2093°E |
+| CBD coordinates | Sydney CBD: –33.8688°S, 151.2093°E |
 
 ---
 
-*This document reflects the analytical position as of the pipeline's current published state.
-It will be updated as Phase 2 and Phase 3 work progresses.*
+*This document reflects the analytical position as of the project's current state: Stage 1 complete, Stage 2 kept as published on the earlier extraction, Stage 3 planned. It will be updated as the project progresses.*
