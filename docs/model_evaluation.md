@@ -1,6 +1,6 @@
 # Model evaluation
 
-This document holds the full model results behind the headline figures in the [README](../README.md): every model, every segment, the ablations, where the models are weak, the counter-check with other boosting libraries, and a leakage audit. It is written to stand on its own, because the analysis code is not published. **Every table below was generated from the printed output of the executed analysis notebooks**, not typed by hand.
+This document holds the full model results behind the headline figures in the [README](../README.md): every model, every segment, the ablations, where the models are weak, the counter-check with other boosting libraries, and a leakage audit. It is written to stand on its own, because the full analysis code is not published (only the leakage-critical feature functions are, in [`../code/`](../code/)). **Every table below was generated from the printed output of the executed analysis notebooks**, not typed by hand.
 
 ## 1. How to read the numbers
 
