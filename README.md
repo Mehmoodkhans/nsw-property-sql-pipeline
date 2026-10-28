@@ -181,11 +181,12 @@ docs/
 code/
   price_history_features.py       the two leakage-critical feature functions
   test_price_history_features.py  15 tests on synthetic data (run: cd code && pytest -q)
-archive/notebooks/         the superseded first-version SQL notebook (kept for the record)
-archive/Visual/            charts from the superseded first version
-archive/presentation/      the first version's case-study page (superseded); a new presentation is planned```
+notebooks/                 the superseded first-version SQL notebook (kept for the record)
+Visual/                    charts from the superseded first version
+presentation/              the first version's case-study page (superseded); a new presentation is planned
+```
 
-**The full analysis code is not published.** Every figure in this repository was taken from an executed analysis notebook, and the documents describe the method, the rules and the checks in enough detail to reproduce them from the public source data. The one piece that is published is the part most open to doubt: the functions that build price-history inputs without leakage, with tests that need no data ([`code/`](code/)). They show that those functions behave as described; they do not on their own show that the whole pipeline is leak-free (see the audit in [`docs/model_evaluation.md`](docs/model_evaluation.md)). The rest of the code is not public, and I am glad to walk through it on request (contact via LinkedIn below).
+**The full analysis code is not published.** Every figure in this repository was taken from an executed analysis notebook, and the documents describe the method, the rules and the checks in enough detail to reproduce them from the public source data. The one piece that is published is the part most open to doubt: the functions that build price-history inputs without leakage, with tests that need no data ([`code/`](code/)). They show that those functions behave as described; they do not on their own show that the whole pipeline is leak-free (see the audit in [`docs/model_evaluation.md`](docs/model_evaluation.md)). [Add a line here if you choose to offer the rest of the code on request.]
 
 ---
 
@@ -200,7 +201,8 @@ archive/presentation/      the first version's case-study page (superseded); a n
 
 ## Earlier work
 
-The first version of this project, a DuckDB SQL pipeline over a merged CSV with 23 charts and a case-study page, is kept in [`archive/notebooks/`](archive/notebooks/), [`archive/Visual/`](archive/Visual/) and [`archive/presentation/`](archive/presentation/). It is **superseded**, and its headline findings are retired for the reasons in the table above.
+The first version of this project, a DuckDB SQL pipeline over a merged CSV with 23 charts and a case-study page, is kept in [`notebooks/`](notebooks/), [`Visual/`](Visual/) and [`presentation/`](presentation/). It is **superseded**, and its headline findings are retired for the reasons in the table above.
+
 ---
 
 ## Author
