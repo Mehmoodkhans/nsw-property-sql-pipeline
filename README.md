@@ -181,10 +181,9 @@ docs/
 code/
   price_history_features.py       the two leakage-critical feature functions
   test_price_history_features.py  15 tests on synthetic data (run: cd code && pytest -q)
-notebooks/                 the superseded first-version SQL notebook (kept for the record)
-Visual/                    charts from the superseded first version
-presentation/              the first version's case-study page (superseded); a new presentation is planned
-```
+archive/notebooks/         the superseded first-version SQL notebook (kept for the record)
+archive/Visual/            charts from the superseded first version
+archive/presentation/      the first version's case-study page (superseded); a new presentation is planned```
 
 **The full analysis code is not published.** Every figure in this repository was taken from an executed analysis notebook, and the documents describe the method, the rules and the checks in enough detail to reproduce them from the public source data. The one piece that is published is the part most open to doubt: the functions that build price-history inputs without leakage, with tests that need no data ([`code/`](code/)). They show that those functions behave as described; they do not on their own show that the whole pipeline is leak-free (see the audit in [`docs/model_evaluation.md`](docs/model_evaluation.md)). The rest of the code is not public, and I am glad to walk through it on request (contact via LinkedIn below).
 
