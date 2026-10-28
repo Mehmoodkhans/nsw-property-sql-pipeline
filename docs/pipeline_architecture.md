@@ -2,7 +2,7 @@
 
 This is the technical reference for the rebuilt pipeline: what each stage does, the rules it follows, and the evidence behind every threshold. The full analysis code is not published (only the leakage-critical feature functions are, in [`../code/`](../code/)), so the reasoning and the evidence are written out here instead. Where a figure appears in the [README](../README.md) it is not repeated; where it belongs to the data itself it is in [`data_provenance.md`](data_provenance.md); full model results are in [`model_evaluation.md`](model_evaluation.md).
 
-The earlier SQL pipeline (Stages 00–13 over a merged CSV) is **superseded** and kept in (../archive/notebooks/)(../notebooks/). Nothing here depends on it.
+The earlier SQL pipeline (Stages 00–13 over a merged CSV) is **superseded** and kept in [`../archive/notebooks/`](../archive/notebooks/). Nothing here depends on it..
 
 ---
 
