@@ -1,9 +1,22 @@
-*.csv 
-*.db 
-*.sqlite 
-__pycache__/ 
-.ipynb_checkpoints/ 
+# Data files (too large for the repo)
+*.csv
+*.db
+*.duckdb
+*.sqlite
+*.parquet
+*.wal
+
+# Python
 __pycache__/
-.pytest_cache/
 *.pyc
+.pytest_cache/
+.venv/
+venv/
+
+# Jupyter
 .ipynb_checkpoints/
+
+# Secrets and OS files
+.env
+.DS_Store
+Thumbs.db
