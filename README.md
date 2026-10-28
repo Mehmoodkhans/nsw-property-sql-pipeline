@@ -200,8 +200,7 @@ archive/presentation/      the first version's case-study page (superseded); a n
 
 ## Earlier work
 
-The first version of this project, a DuckDB SQL pipeline over a merged CSV with 23 charts and a case-study page, is kept in [`notebooks/`](notebooks/), [`Visual/`](Visual/) and [`presentation/`](presentation/). It is **superseded**, and its headline findings are retired for the reasons in the table above.
-
+The first version of this project, a DuckDB SQL pipeline over a merged CSV with 23 charts and a case-study page, is kept in [`archive/notebooks/`](archive/notebooks/), [`archive/Visual/`](archive/Visual/) and [`archive/presentation/`](archive/presentation/). It is **superseded**, and its headline findings are retired for the reasons in the table above.
 ---
 
 ## Author
