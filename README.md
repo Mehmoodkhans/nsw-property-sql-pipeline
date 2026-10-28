@@ -9,7 +9,7 @@
 
 The first version of this project looked finished: a SQL pipeline, 23 charts, a case study and a headline model score. When I went back to the raw government archive to check it, several of its foundations did not hold. This repository documents the rebuild: what was wrong, how it was found, what replaced it, and what the corrected model can and cannot do.
 
-> **Status.** The analysis and models described here are complete. A map app and a presentation are planned and will be added to this repository. The earlier SQL version is kept for the record in [`notebooks/`](notebooks/), [`Visual/`](Visual/) and [`presentation/`](presentation/) and is **superseded**.
+> **Status.** The analysis and models described here are complete. A map app and a presentation are planned and will be added to this repository. The earlier SQL version is kept for the record in [`archive/notebooks/`](archive/notebooks/), [`archive/Visual/`](archive/Visual/) and [`archive/presentation/`](archive/presentation/) and is **superseded**.
 
 ---
 
