@@ -202,10 +202,10 @@ presentation/              the first version's case-study page (superseded); a n
 ## Earlier work
 
 The first version of this project, a DuckDB SQL pipeline over a merged CSV with 23 charts and a case-study page, is kept in [`archive/notebooks/`](archive/notebooks/), [`archive/Visual/`](archive/Visual/) and [`archive/presentation/`](archive/presentation/). It is **superseded**, and its headline findings are retired for the reasons in the table above.
+
 ---
 
 ## Author
-
 **Mehmood Ahmed Khan**, Data Scientist & Analytics Engineer
 
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Mehmood%20Ahmed-0077B5?logo=linkedin&logoColor=white)](https://www.linkedin.com/in/mehmoood)
