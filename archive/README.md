@@ -6,7 +6,7 @@ This folder holds the **first version** of the project, kept for the record: a D
 |---|---|
 | [`notebooks/`](notebooks/) | the SQL pipeline notebook |
 | [`Visual/`](Visual/) | its 23 charts |
-| [`presentation/`](presentation/) | its case-study page |
+| [`presentation/`](presentation/) | its case-study page ([view it in the browser](https://mehmoodkhans.github.io/nsw-property-sql-pipeline/archive/presentation/NSW_Property_Market_Case_Study.html); the file is too large for GitHub to display) |
 
 **It should not be used for results.** Rebuilding the analysis from the raw archive showed that several of its foundations did not hold: area was assumed to be in square metres when 6.9% of rows are in hectares, the 2023 "gap" was dates lost in the earlier extraction, each row was treated as a sale although one sale can span several lots, postcode-level area labels were used as if they described the locality, and its model scores came from a split that is not comparable with the time-based validation now used.
 
