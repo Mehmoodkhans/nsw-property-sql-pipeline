@@ -4,10 +4,9 @@
 
 ## How to view it
 
-GitHub shows `.html` files as source code, not as a page. Use one of these instead:
+The file is about 8 MB, which is too large for GitHub to display, so it cannot be opened on GitHub itself. Open it through the hosted link instead:
 
-1. **Open it in your browser (recommended):** [View the presentation](https://mehmoodkhans.github.io/nsw-property-sql-pipeline/archive/presentation/NSW_Property_Market_Case_Study.html)
-2. **Download it:** open [the file](NSW_Property_Market_Case_Study.html), click the download icon, then open the saved file in Chrome or Edge.
-3. **Quick preview (third-party viewer, styling may differ):** [htmlpreview](https://htmlpreview.github.io/?https://github.com/Mehmoodkhans/nsw-property-sql-pipeline/blob/main/archive/presentation/NSW_Property_Market_Case_Study.html)
+1. **View in your browser (recommended):** [Open the presentation](https://mehmoodkhans.github.io/nsw-property-sql-pipeline/archive/presentation/NSW_Property_Market_Case_Study.html)
+2. **Keep a copy:** open the link above in Chrome or Edge and press `Ctrl + S` to save it, or clone the repository and open `archive/presentation/NSW_Property_Market_Case_Study.html` from your computer.
 
 For the best font rendering, use Chrome or Edge. To export a PDF, choose `File → Print → Save as PDF` with A4 paper, no margins, and Background graphics enabled.
